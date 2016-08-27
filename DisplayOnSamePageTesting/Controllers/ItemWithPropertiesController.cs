@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DisplayOnSamePageTesting.Models;
+using Newtonsoft.Json;
 
 namespace DisplayOnSamePageTesting.Controllers
 {
@@ -24,6 +25,12 @@ namespace DisplayOnSamePageTesting.Controllers
                 return View(db.Items.SingleOrDefault(i => i.Id == itemID.Value));
         }
 
+        public ActionResult AJAXIndex()
+        {
+            PopulateOrganizationsDropDownList();
+            return View();
+        }
+
         private void PopulateOrganizationsDropDownList(int? selectedItem = 1)
         {
             var itemQuery = from r in db.Items
@@ -32,6 +39,17 @@ namespace DisplayOnSamePageTesting.Controllers
             ViewBag.ItemId = new SelectList(itemQuery, "Id", "Name", selectedItem);
         }
 
+        public JsonResult GetItem(int id)
+        {
+            var item = db.Items.SingleOrDefault(i => i.Id == id);
+            //string json = JsonConvert.SerializeObject(item);
+            JsonResult json = new JsonResult
+            {
+                Data = item,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+            return json;
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
